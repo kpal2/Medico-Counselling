@@ -110,3 +110,57 @@ This repo includes:
 - [`vercel.json`](/c:/Users/amite/Downloads/project/neet-counselling-web/vercel.json) for Vercel SPA rewrites
 
 That ensures routes like `/explore`, `/cutoff`, and `/college/200502` still work after a browser refresh.
+
+## Authentication with Supabase
+
+The app now includes frontend auth wiring for:
+
+- Google sign-in
+- phone number OTP sign-in
+
+Code paths:
+
+- [`src/lib/supabase.js`](/c:/Users/amite/Downloads/project/neet-counselling-web/src/lib/supabase.js)
+- [`src/hooks/useAuth.jsx`](/c:/Users/amite/Downloads/project/neet-counselling-web/src/hooks/useAuth.jsx)
+- [`src/components/AuthModal.jsx`](/c:/Users/amite/Downloads/project/neet-counselling-web/src/components/AuthModal.jsx)
+
+### Environment variables
+
+Create a local `.env` file from [`.env.example`](/c:/Users/amite/Downloads/project/neet-counselling-web/.env.example):
+
+```bash
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-public-anon-key
+```
+
+Recommended:
+
+- use `.env.local` on your machine
+- do not commit `.env.local`
+- keep only `.env.example` in git
+- add the same values in Vercel Project Settings -> Environment Variables for deployment
+
+Set the same variables in Vercel Project Settings -> Environment Variables.
+
+### Supabase dashboard setup
+
+In your Supabase project:
+
+1. Go to `Authentication -> Providers -> Google`
+2. Enable Google
+3. Add your Google OAuth client ID and secret
+4. Set the redirect URL to your deployed site URL
+
+For phone login:
+
+1. Go to `Authentication -> Providers -> Phone`
+2. Enable phone auth
+3. Configure OTP / SMS delivery in Supabase using the provider supported in your project dashboard
+4. Use E.164 phone numbers in the UI, for example `+919876543210`
+
+### Production redirect URLs
+
+Make sure these URLs are allowed in Supabase Auth settings:
+
+- your Vercel production domain
+- your local dev URL, typically `http://localhost:5173`

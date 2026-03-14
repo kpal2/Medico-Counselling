@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const CutoffChart = ({
   title = "Cutoff Chart",
@@ -18,15 +18,12 @@ const CutoffChart = ({
   const innerH = h - padY * 2;
   const xDivisor = Math.max(safePoints.length - 1, 1);
 
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [title, subtitle, points.length]);
-
   const toX = (i) => padX + (innerW * i) / xDivisor;
   const toY = (v) => padY + innerH - (innerH * v) / 100;
 
   const poly = safePoints.map((value, index) => `${toX(index)},${toY(value)}`).join(" ");
-  const activeDetail = details[activeIndex];
+  const resolvedIndex = Math.min(activeIndex, Math.max(details.length - 1, 0));
+  const activeDetail = details[resolvedIndex];
 
   return (
     <div className="chartCard">
@@ -54,8 +51,8 @@ const CutoffChart = ({
               <circle
                 cx={toX(index)}
                 cy={toY(value)}
-                r={index === activeIndex ? "7" : "5"}
-                className={index === activeIndex ? "chartDot chartDot--active" : "chartDot"}
+                r={index === resolvedIndex ? "7" : "5"}
+                className={index === resolvedIndex ? "chartDot chartDot--active" : "chartDot"}
                 onClick={() => setActiveIndex(index)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {

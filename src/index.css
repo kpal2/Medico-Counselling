@@ -1045,6 +1045,123 @@ button{ font-family: inherit; }
   margin-top: 24px;
 }
 
+.authStatus{
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: rgba(15,23,42,0.65);
+  font-weight: 700;
+}
+
+.authOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 20, 35, 0.48);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  z-index: 30;
+}
+
+.authModal{
+  width: min(480px, 100%);
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 60px rgba(15,23,42,0.22);
+  padding: 24px;
+  position: relative;
+}
+
+.authClose{
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(15,23,42,0.10);
+  background: #fff;
+  cursor: pointer;
+}
+
+.authHeader h2{
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.authHeader p{
+  margin: 0 0 18px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.authGoogleBtn{
+  width: 100%;
+  border: 1px solid rgba(15,23,42,0.12);
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.authDivider{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: rgba(15,23,42,0.48);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.authDivider::before,
+.authDivider::after{
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(15,23,42,0.08);
+}
+
+.authForm{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.authActions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.authAction{
+  min-width: 120px;
+}
+
+.authAlert{
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.authAlert--success{
+  background: rgba(34, 197, 94, 0.12);
+  color: #166534;
+}
+
+.authAlert--error{
+  background: rgba(239, 68, 68, 0.12);
+  color: #991b1b;
+}
+
 @media (max-width: 768px){
   .statsGrid{
     grid-template-columns: 1fr;
@@ -1058,5 +1175,19 @@ button{ font-family: inherit; }
 
   .chartLegend__meta{
     grid-template-columns: 1fr;
+  }
+
+  .topbar__inner{
+    flex-wrap: wrap;
+  }
+
+  .nav{
+    width: 100%;
+    overflow: auto;
+  }
+
+  .topbar__right{
+    width: 100%;
+    justify-content: flex-end;
   }
 }
