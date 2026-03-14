@@ -1,4 +1,5 @@
-import { NavLink, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import RouteLinks from "./RouteLinks";
 
 const Navbar = () => {
   return (
@@ -24,17 +25,7 @@ const Navbar = () => {
           <span className="brand__name">MediCounsel</span>
         </Link>
 
-        <nav className="nav">
-          <NavLink to="/" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
-            Home
-          </NavLink>
-          <NavLink to="/explore" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
-            Counselling Trends
-          </NavLink>
-          <NavLink to="/predictor" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
-            College Predictor
-          </NavLink>
-        </nav>
+        <RouteLinks />
 
         <div className="topbar__right">
           <button className="linkBtn">Sign In</button>

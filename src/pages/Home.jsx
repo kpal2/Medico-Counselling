@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
+import { useCounsellingData } from "../hooks/useCounsellingData";
+import { formatRank } from "../lib/counsellingData";
 
 const Home = () => {
+  const { data } = useCounsellingData();
+
   return (
     <div className="home">
-      {/* HERO */}
       <section className="hero">
         <div className="hero__inner">
           <div className="hero__left">
-            <div className="pill">Updated for NEET PG 2026</div>
+            <div className="pill">Updated for NEET counselling data</div>
 
             <h1 className="hero__title">
               Master Your Medical <br />
@@ -15,13 +18,12 @@ const Home = () => {
             </h1>
 
             <p className="hero__subtitle">
-              Data-driven insights for MBBS and BDS graduates. Analyze trends, predict your chances,
-              and secure your dream PG seat with confidence.
+              Explore real admitted records, closing ranks, and institute-level cutoffs from the imported counselling database.
             </p>
 
             <div className="hero__cta">
               <Link className="ctaBtn ctaBtn--primary" to="/explore">
-                Check Counselling Trends <span aria-hidden="true">→</span>
+                Check Counselling Trends <span aria-hidden="true">-&gt;</span>
               </Link>
               <Link className="ctaBtn ctaBtn--ghost" to="/predictor">
                 College Predictor
@@ -35,36 +37,35 @@ const Home = () => {
         </div>
       </section>
 
-      {/* TRUST */}
       <section className="trust">
         <div className="trust__inner">
           <h2 className="sectionTitle">Why Trust MediCounsel?</h2>
           <p className="sectionSubtitle">
-            We process millions of data points from previous years' counselling rounds to give you the most accurate predictions.
+            The interface is now backed by the imported counselling database instead of static placeholder cards.
           </p>
 
           <div className="cardGrid">
             <div className="infoCard">
-              <div className="infoIcon" aria-hidden="true">📊</div>
-              <div className="infoTitle">5-Year Trend Analysis</div>
+              <div className="infoIcon" aria-hidden="true">#</div>
+              <div className="infoTitle">Real Admissions</div>
               <div className="infoText">
-                Deep dive into opening and closing ranks for every college and specialty across India.
+                {data ? `${formatRank(data.meta.totalAdmissions)} admitted records are available to explore.` : "Loading admissions from the database export."}
               </div>
             </div>
 
             <div className="infoCard infoCard--raised">
-              <div className="infoIcon" aria-hidden="true">🛡️</div>
-              <div className="infoTitle">Verified Seat Matrix</div>
+              <div className="infoIcon" aria-hidden="true">#</div>
+              <div className="infoTitle">Institute Coverage</div>
               <div className="infoText">
-                Real-time updates on seat availability for All India Quota, State Quota, and Deemed Universities.
+                {data ? `${formatRank(data.meta.totalInstitutes)} institutes and ${formatRank(data.meta.totalCutoffGroups)} cutoff combinations are indexed.` : "Loading institute coverage."}
               </div>
             </div>
 
             <div className="infoCard">
-              <div className="infoIcon" aria-hidden="true">👥</div>
-              <div className="infoTitle">Community Insights</div>
+              <div className="infoIcon" aria-hidden="true">#</div>
+              <div className="infoTitle">Actionable Filters</div>
               <div className="infoText">
-                Connect with previous year toppers and get mentorship on choice filling strategies.
+                Filter by subject, quota, category, state, and round without leaving the frontend.
               </div>
             </div>
           </div>

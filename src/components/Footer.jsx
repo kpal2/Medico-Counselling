@@ -1,23 +1,29 @@
+import { Link } from "react-router-dom";
+import { useCounsellingData } from "../hooks/useCounsellingData";
+import { formatRank } from "../lib/counsellingData";
+
 const Footer = () => {
+  const { data } = useCounsellingData();
+
   return (
     <footer className="footer">
       <section className="statsBand">
         <div className="statsBand__inner">
           <div className="stat">
-            <div className="stat__num">50k+</div>
-            <div className="stat__label">Candidates Guided</div>
+            <div className="stat__num">{data ? formatRank(data.meta.totalAdmissions) : "..."}</div>
+            <div className="stat__label">Admitted Records</div>
           </div>
           <div className="stat">
-            <div className="stat__num">98%</div>
-            <div className="stat__label">Prediction Accuracy</div>
+            <div className="stat__num">{data ? formatRank(data.meta.totalCutoffGroups) : "..."}</div>
+            <div className="stat__label">Cutoff Groups</div>
           </div>
           <div className="stat">
-            <div className="stat__num">450+</div>
-            <div className="stat__label">Medical Colleges</div>
+            <div className="stat__num">{data ? formatRank(data.meta.totalInstitutes) : "..."}</div>
+            <div className="stat__label">Institutes</div>
           </div>
           <div className="stat">
-            <div className="stat__num">24/7</div>
-            <div className="stat__label">Support during Rounds</div>
+            <div className="stat__num">5</div>
+            <div className="stat__label">Counselling Rounds</div>
           </div>
         </div>
       </section>
@@ -46,60 +52,33 @@ const Footer = () => {
             </div>
 
             <p className="footerText">
-              Empowering medical aspirants with data-driven insights for a successful counselling career.
-              Trust the numbers, not the rumors.
+              Explore the imported counselling database with transparent filters instead of hardcoded sample content.
             </p>
-
-            <div className="socialRow" aria-label="social links">
-              <a className="socialBtn" href="#" aria-label="Twitter">𝕏</a>
-              <a className="socialBtn" href="#" aria-label="Facebook">f</a>
-              <a className="socialBtn" href="#" aria-label="Instagram">⌁</a>
-              <a className="socialBtn" href="#" aria-label="LinkedIn">in</a>
-            </div>
           </div>
 
           <div className="footerCol">
             <div className="footerTitle">Quick Links</div>
-            <a className="footerLink" href="/">Home</a>
-            <a className="footerLink" href="/explore">Counselling Trends</a>
-            <a className="footerLink" href="/predictor">College Predictor</a>
-            <a className="footerLink" href="#">Premium Plans</a>
+            <Link className="footerLink" to="/">Home</Link>
+            <Link className="footerLink" to="/explore">Counselling Trends</Link>
+            <Link className="footerLink" to="/predictor">College Predictor</Link>
+            <Link className="footerLink" to="/cutoff">Last Rank Finder</Link>
           </div>
 
           <div className="footerCol">
             <div className="footerTitle">Resources</div>
-            <a className="footerLink" href="#">NEET PG 2026 Bulletin</a>
-            <a className="footerLink" href="#">Seat Matrix</a>
-            <a className="footerLink" href="#">Rank Analysis</a>
-            <a className="footerLink" href="#">College Reviews</a>
+            <Link className="footerLink" to="/colleges">Colleges</Link>
+            <Link className="footerLink" to="/cutoff">Cutoff Search</Link>
+            <Link className="footerLink" to="/about">About</Link>
           </div>
 
-          <div className="footerCol">
-            <div className="footerTitle">Contact Us</div>
-
-            <div className="contactItem">
-              <span className="contactIcon" aria-hidden="true">📍</span>
-              <span>123 Medical Enclave, Health City, New Delhi - 110001</span>
-            </div>
-
-            <div className="contactItem">
-              <span className="contactIcon" aria-hidden="true">📞</span>
-              <span>+91 98765 43210</span>
-            </div>
-
-            <div className="contactItem">
-              <span className="contactIcon" aria-hidden="true">✉️</span>
-              <span>support@medicounsel.com</span>
-            </div>
-          </div>
         </div>
 
         <div className="footerBottom">
-          <span>© {new Date().getFullYear()} MediCounsel. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} MediCounsel. All rights reserved.</span>
           <div className="footerBottom__links">
-            <a className="footerMiniLink" href="#">Privacy Policy</a>
-            <a className="footerMiniLink" href="#">Terms</a>
-            <a className="footerMiniLink" href="#">Support</a>
+            <Link className="footerMiniLink" to="/about">About</Link>
+            <Link className="footerMiniLink" to="/colleges">Colleges</Link>
+            <Link className="footerMiniLink" to="/cutoff">Cutoffs</Link>
           </div>
         </div>
       </section>

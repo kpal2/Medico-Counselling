@@ -1,20 +1,96 @@
+import { useDeferredValue, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useCounsellingData } from "../hooks/useCounsellingData";
+import { formatRank } from "../lib/counsellingData";
 
 const Colleges = () => {
+  const { data, loading, error } = useCounsellingData();
+  const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+
+  const colleges = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
+    const query = deferredSearch.trim().toLowerCase();
+
+    return data.colleges
+      .filter((college) => {
+        if (!query) {
+          return true;
+        }
+
+        return [college.name, college.code, college.city, college.state, ...(college.subjects || [])]
+          .filter(Boolean)
+          .some((value) => value.toLowerCase().includes(query));
+      })
+      .slice(0, 60);
+  }, [data, deferredSearch]);
+
+  if (loading) {
+    return <div className="dataPage"><p>Loading colleges...</p></div>;
+  }
+
+  if (error) {
+    return <div className="dataPage"><p>Unable to load college data: {error}</p></div>;
+  }
+
   return (
-    <div>
-      <h2>Colleges</h2>
-      <ul>
-        <li>
-          <Link to="/college/200502">AIIMS New Delhi</Link>
-        </li>
-        <li>
-          <Link to="/college/200521">JIPMER Puducherry</Link>
-        </li>
-        <li>
-          <Link to="/college/200505">AIIMS Jodhpur</Link>
-        </li>
-      </ul>
+    <div className="dataPage">
+      <div className="pageIntro">
+        <h2>Colleges</h2>
+        <p>Browse institutes from the normalized database export.</p>
+      </div>
+
+      <div className="toolCard">
+        <input
+          className="textInput"
+          type="search"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search by college, code, city, state, or subject"
+        />
+      </div>
+
+      <div className="resultsList">
+        {colleges.map((college) => (
+          <div className="resultCard" key={college.code}>
+            <div className="resultCard__top">
+              <div>
+                <div className="collegeName">{college.name}</div>
+                <div className="locText">
+                  {college.code}
+                  {college.city ? ` • ${college.city}` : ""}
+                  {college.state ? ` • ${college.state}` : ""}
+                </div>
+              </div>
+              <Link className="btnPrimary" to={`/college/${college.code}`}>
+                View Details
+              </Link>
+            </div>
+
+            <div className="metricsRow">
+              <div className="metric">
+                <div className="metricLabel">Subjects</div>
+                <div className="metricValue metricChips">
+                  {college.subjects.map((subject) => (
+                    <span className="chip" key={subject}>{subject}</span>
+                  ))}
+                </div>
+              </div>
+              <div className="metric">
+                <div className="metricLabel">Best AIR</div>
+                <div className="metricValue">{formatRank(college.best_rank)}</div>
+              </div>
+              <div className="metric">
+                <div className="metricLabel">Last Recorded AIR</div>
+                <div className="metricValue">{formatRank(college.last_rank)}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:import": "python scripts/import_counselling_csv.py",
+    "db:export": "python scripts/export_counselling_data.py",
+    "db:refresh": "python scripts/import_counselling_csv.py && python scripts/export_counselling_data.py"
   },
   "dependencies": {
     "react": "^19.2.0",
