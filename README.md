@@ -115,7 +115,6 @@ That ensures routes like `/explore`, `/cutoff`, and `/college/200502` still work
 
 The app now includes frontend auth wiring for:
 
-- Google sign-in
 - phone number OTP sign-in
 
 Code paths:
@@ -145,11 +144,6 @@ Set the same variables in Vercel Project Settings -> Environment Variables.
 ### Supabase dashboard setup
 
 In your Supabase project:
-
-1. Go to `Authentication -> Providers -> Google`
-2. Enable Google
-3. Add your Google OAuth client ID and secret
-4. Set the redirect URL to your deployed site URL
 
 For phone login:
 

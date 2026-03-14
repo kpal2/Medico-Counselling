@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../hooks/auth-context";
 
 const AuthModal = ({ isOpen, onClose }) => {
@@ -10,32 +10,9 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const redirectTo = useMemo(() => window.location.origin, []);
-
   if (!isOpen) {
     return null;
   }
-
-  const handleGoogleSignIn = async () => {
-    if (!supabase) {
-      return;
-    }
-
-    setSubmitting(true);
-    setError("");
-
-    const { error: authError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo,
-      },
-    });
-
-    if (authError) {
-      setError(authError.message);
-      setSubmitting(false);
-    }
-  };
 
   const handleSendOtp = async (event) => {
     event.preventDefault();
@@ -100,7 +77,7 @@ const AuthModal = ({ isOpen, onClose }) => {
 
         <div className="authHeader">
           <h2 id="signin-title">Sign In</h2>
-          <p>Use Google or your phone number. Auth is handled by Supabase.</p>
+          <p>Use your phone number with OTP. Auth is handled by Supabase.</p>
         </div>
 
         {!isConfigured && (
@@ -111,14 +88,6 @@ const AuthModal = ({ isOpen, onClose }) => {
 
         {isConfigured && (
           <>
-            <button className="authGoogleBtn" type="button" onClick={handleGoogleSignIn} disabled={submitting}>
-              Continue with Google
-            </button>
-
-            <div className="authDivider">
-              <span>or use phone OTP</span>
-            </div>
-
             {step === "phone" ? (
               <form onSubmit={handleSendOtp} className="authForm">
                 <label className="filterLabel">
