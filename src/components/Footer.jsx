@@ -48,24 +48,25 @@ const Footer = () => {
                   />
                 </svg>
               </div>
-              <div className="brandName">MediCounsel</div>
+              <div className="brandName">CounselFlow</div>
             </div>
 
             <p className="footerText">
-              Explore the imported medical counselling database with transparent filters and track-specific tools.
+              A unified counselling platform shell with dedicated experiences for each admission track.
             </p>
           </div>
 
           <div className="footerCol">
             <div className="footerTitle">Quick Links</div>
             <Link className="footerLink" to="/">Home</Link>
+            <Link className="footerLink" to="/medical">Medical Counselling</Link>
+            <Link className="footerLink" to="/engineering">JEE Counselling</Link>
             <Link className="footerLink" to="/explore">Counselling Trends</Link>
-            <Link className="footerLink" to="/predictor">College Predictor</Link>
-            <Link className="footerLink" to="/cutoff">Last Rank Finder</Link>
           </div>
 
           <div className="footerCol">
             <div className="footerTitle">Resources</div>
+            <Link className="footerLink" to="/predictor">College Predictor</Link>
             <Link className="footerLink" to="/colleges">Colleges</Link>
             <Link className="footerLink" to="/cutoff">Cutoff Search</Link>
             <Link className="footerLink" to="/about">About</Link>

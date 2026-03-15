@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import RouteLinks from "./RouteLinks";
 
 const Navbar = () => {
+  const { pathname } = useLocation();
+  const isPlatformHome = pathname === "/";
+
   return (
     <header className="topbar">
       <div className="topbar__inner">
@@ -22,16 +25,36 @@ const Navbar = () => {
               />
             </svg>
           </span>
-          <span className="brand__name">MediCounsel</span>
+          <span className="brand__name">CounselFlow</span>
         </Link>
 
-        <RouteLinks />
+        {isPlatformHome ? (
+          <nav className="nav">
+            <NavLink to="/medical" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
+              Medical
+            </NavLink>
+            <NavLink to="/engineering" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
+              Engineering
+            </NavLink>
+            <NavLink to="/about" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
+              About
+            </NavLink>
+          </nav>
+        ) : (
+          <RouteLinks />
+        )}
 
         <div className="topbar__right">
-          <span className="authStatus">Public beta</span>
-          <button className="primaryBtn primaryBtn--disabled" type="button" disabled>
-            Premium Coming Soon
-          </button>
+          {isPlatformHome ? (
+            <Link className="primaryBtn" to="/medical">Open Medical</Link>
+          ) : (
+            <>
+              <span className="authStatus">Public beta</span>
+              <button className="primaryBtn primaryBtn--disabled" type="button" disabled>
+                Premium Coming Soon
+              </button>
+            </>
+          )}
         </div>
       </div>
     </header>

@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 
 import Home from "./pages/Home";
+import MedicalHome from "./pages/MedicalHome";
+import EngineeringHome from "./pages/EngineeringHome";
 import HistoricalExplorer from "./pages/HistoricalExplorer";
 import LastRankFinder from "./pages/LastRankFinder";
 import CollegePredictor from "./pages/CollegePredictor";
@@ -15,6 +17,8 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/medical" element={<MedicalHome />} />
+          <Route path="/engineering" element={<EngineeringHome />} />
           <Route path="/explore" element={<HistoricalExplorer />} />
           <Route path="/cutoff" element={<LastRankFinder />} />
           <Route path="/predictor" element={<CollegePredictor />} />

@@ -4,18 +4,47 @@ import CutoffChart from "../components/CutoffChart";
 import { useCounsellingData } from "../hooks/useCounsellingData";
 import { buildChartPoints, formatRank } from "../lib/counsellingData";
 
-const summarizeByRound = (rows) => {
+const aggregateRoundSeries = (rows, mode) => {
   const grouped = new Map();
 
   rows.forEach((row) => {
-    const current = grouped.get(row.round_number);
-
-    if (!current || row.closing_rank < current.closing_rank) {
-      grouped.set(row.round_number, row);
+    if (!grouped.has(row.round_number)) {
+      grouped.set(row.round_number, []);
     }
+
+    grouped.get(row.round_number).push(row);
   });
 
-  return [...grouped.values()].sort((left, right) => left.round_number - right.round_number);
+  return [...grouped.entries()]
+    .sort((left, right) => left[0] - right[0])
+    .map(([roundNumber, roundRows]) => {
+      const sorted = [...roundRows].sort((left, right) => left.closing_rank - right.closing_rank);
+      const minRow = sorted[0];
+      const maxRow = sorted[sorted.length - 1];
+      const medianRow = sorted[Math.floor(sorted.length / 2)];
+
+      if (mode === "best") {
+        return {
+          ...minRow,
+          round_number: roundNumber,
+          closing_rank: minRow.closing_rank,
+          institute_name: minRow.institute_name,
+          sample_count: roundRows.length,
+          metric_label: "Best closing AIR",
+        };
+      }
+
+      return {
+        ...medianRow,
+        round_number: roundNumber,
+        closing_rank: medianRow.closing_rank,
+        institute_name: `${roundRows.length} matching cutoff groups`,
+        sample_count: roundRows.length,
+        min_rank: minRow.closing_rank,
+        max_rank: maxRow.closing_rank,
+        metric_label: "Median closing AIR",
+      };
+    });
 };
 
 const chanceClass = (chance) => {
@@ -27,13 +56,14 @@ const chanceClass = (chance) => {
 const buildChartDetails = (rows, labelPrefix) => (
   rows.map((row) => ({
     label: `Round ${row.round_number}`,
-    value: `Closing AIR ${formatRank(row.closing_rank)}`,
+    value: `${row.metric_label ?? "Closing AIR"} ${formatRank(row.closing_rank)}`,
     meta: [
       { label: "Institute", value: row.institute_name ?? "-" },
       { label: "Quota", value: row.quota_name ?? "-" },
       { label: "Category", value: row.category_name ?? "-" },
       { label: labelPrefix, value: row.subject_name ?? "-" },
-      { label: "Admitted", value: formatRank(row.admitted_count) },
+      { label: "Samples", value: formatRank(row.sample_count ?? row.admitted_count) },
+      ...(row.min_rank != null ? [{ label: "Round range", value: `${formatRank(row.min_rank)} - ${formatRank(row.max_rank)}` }] : []),
     ],
   }))
 );
@@ -67,19 +97,13 @@ const HistoricalExplorer = () => {
     courses: [row.subject_name, row.quota_name],
   }));
 
-  const topCollegeRows = useMemo(() => {
-    if (!filteredRows.length) {
-      return [];
-    }
+  const bestTrendByRound = useMemo(
+    () => aggregateRoundSeries(filteredRows, "best"),
+    [filteredRows],
+  );
 
-    const topCollege = filteredRows[0].institute_name;
-    return summarizeByRound(
-      filteredRows.filter((row) => row.institute_name === topCollege),
-    );
-  }, [filteredRows]);
-
-  const roundSnapshot = useMemo(
-    () => summarizeByRound(filteredRows),
+  const medianTrendByRound = useMemo(
+    () => aggregateRoundSeries(filteredRows, "median"),
     [filteredRows],
   );
 
@@ -142,18 +166,18 @@ const HistoricalExplorer = () => {
       <section className="trendsMain">
         <div className="chartRow">
           <CutoffChart
-            title={topCollegeRows[0] ? `${topCollegeRows[0].institute_name} cutoff` : "Top college cutoff"}
-            subtitle="Closing rank by round"
-            points={buildChartPoints(topCollegeRows)}
-            years={topCollegeRows.map((row) => `R${row.round_number}`)}
-            details={buildChartDetails(topCollegeRows, "Subject")}
+            title={`${subject} best cutoff trend`}
+            subtitle="Most competitive closing AIR by round for current filters"
+            points={buildChartPoints(bestTrendByRound)}
+            years={bestTrendByRound.map((row) => `R${row.round_number}`)}
+            details={buildChartDetails(bestTrendByRound, "Subject")}
           />
           <CutoffChart
-            title={`${subject} snapshot`}
-            subtitle="Best visible cutoffs in current filter"
-            points={buildChartPoints(roundSnapshot)}
-            years={roundSnapshot.map((row) => `R${row.round_number}`)}
-            details={buildChartDetails(roundSnapshot, "Subject")}
+            title={`${subject} round median`}
+            subtitle="Median closing AIR by round for current filters"
+            points={buildChartPoints(medianTrendByRound)}
+            years={medianTrendByRound.map((row) => `R${row.round_number}`)}
+            details={buildChartDetails(medianTrendByRound, "Subject")}
           />
         </div>
 
