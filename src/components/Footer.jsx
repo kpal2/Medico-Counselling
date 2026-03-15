@@ -52,7 +52,7 @@ const Footer = () => {
             </div>
 
             <p className="footerText">
-              Explore the imported counselling database with transparent filters instead of hardcoded sample content.
+              Explore the imported medical counselling database with transparent filters and track-specific tools.
             </p>
           </div>
 
