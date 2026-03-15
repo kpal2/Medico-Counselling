@@ -53,6 +53,30 @@ const chanceClass = (chance) => {
   return "pillChance pillChance--low";
 };
 
+const buildUniqueRecommendations = (rows) => {
+  const byInstitute = new Map();
+
+  rows.forEach((row) => {
+    const current = byInstitute.get(row.institute_code);
+
+    if (!current || row.closing_rank < current.closing_rank) {
+      byInstitute.set(row.institute_code, row);
+    }
+  });
+
+  return [...byInstitute.values()]
+    .sort((left, right) => left.closing_rank - right.closing_rank)
+    .slice(0, 25)
+    .map((row, index) => ({
+      ...row,
+      type: row.quota_name.includes("Deemed") ? "Deemed" : "Govt",
+      city: row.city || row.state || "-",
+      cutoff: row.closing_rank,
+      chance: index < 8 ? "Low" : index < 16 ? "Medium" : "High",
+      courses: [row.subject_name, row.quota_name, `Round ${row.round_number}`],
+    }));
+};
+
 const buildChartDetails = (rows, labelPrefix) => (
   rows.map((row) => ({
     label: `Round ${row.round_number}`,
@@ -88,14 +112,10 @@ const HistoricalExplorer = () => {
       .sort((left, right) => left.closing_rank - right.closing_rank);
   }, [category, data, quota, state, subject]);
 
-  const recommendations = filteredRows.slice(0, 25).map((row, index) => ({
-    ...row,
-    type: row.quota_name.includes("Deemed") ? "Deemed" : "Govt",
-    city: row.city || row.state || "-",
-    cutoff: row.closing_rank,
-    chance: index < 8 ? "Low" : index < 16 ? "Medium" : "High",
-    courses: [row.subject_name, row.quota_name],
-  }));
+  const recommendations = useMemo(
+    () => buildUniqueRecommendations(filteredRows),
+    [filteredRows],
+  );
 
   const bestTrendByRound = useMemo(
     () => aggregateRoundSeries(filteredRows, "best"),
