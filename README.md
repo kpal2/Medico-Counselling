@@ -1,6 +1,6 @@
 # NEET Counselling Web
 
-This repo now includes a normalized relational database setup for the admitted-data CSV in [`public/All India_All_Round_25.xlsx - Admitted_Data.csv`](/c:/Users/amite/Downloads/project/neet-counselling-web/public/All%20India_All_Round_25.xlsx%20-%20Admitted_Data.csv).
+This repo now includes a normalised relational database setup for the admitted-data CSV in [`public/All India_All_Round_25.xlsx - Admitted_Data.csv`](/c:/Users/amite/Downloads/project/neet-counselling-web/public/All%20India_All_Round_25.xlsx%20-%20Admitted_Data.csv).
 
 ## Database layout
 
