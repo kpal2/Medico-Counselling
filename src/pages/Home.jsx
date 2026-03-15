@@ -28,6 +28,9 @@ const Home = () => {
               <Link className="ctaBtn ctaBtn--ghost" to="/predictor">
                 College Predictor
               </Link>
+              <button className="ctaBtn ctaBtn--disabled" type="button" disabled>
+                Premium Coming Soon
+              </button>
             </div>
           </div>
 

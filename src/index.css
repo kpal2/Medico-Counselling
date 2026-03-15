@@ -104,6 +104,16 @@ button{ font-family: inherit; }
   box-shadow: 0 10px 20px rgba(18,163,199,0.20);
 }
 .primaryBtn:hover{ filter: brightness(0.98); transform: translateY(-1px); }
+.primaryBtn--disabled{
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+.primaryBtn--disabled:hover{
+  filter: none;
+  transform: none;
+}
 
 /* ====== Hero ====== */
 .hero{
@@ -181,6 +191,12 @@ button{ font-family: inherit; }
   color: rgba(15,23,42,0.75);
 }
 .ctaBtn--ghost:hover{ background: #fff; }
+.ctaBtn--disabled{
+  background: rgba(15,23,42,0.06);
+  border: 1px solid rgba(15,23,42,0.10);
+  color: rgba(15,23,42,0.45);
+  cursor: not-allowed;
+}
 
 .hero__right{
   display:flex;
@@ -1046,90 +1062,9 @@ button{ font-family: inherit; }
 }
 
 .authStatus{
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-size: 13px;
   color: rgba(15,23,42,0.65);
   font-weight: 700;
-}
-
-.authOverlay{
-  position: fixed;
-  inset: 0;
-  background: rgba(6, 20, 35, 0.48);
-  display: grid;
-  place-items: center;
-  padding: 18px;
-  z-index: 30;
-}
-
-.authModal{
-  width: min(480px, 100%);
-  background: #ffffff;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  box-shadow: 0 24px 60px rgba(15,23,42,0.22);
-  padding: 24px;
-  position: relative;
-}
-
-.authClose{
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  border: 1px solid rgba(15,23,42,0.10);
-  background: #fff;
-  cursor: pointer;
-}
-
-.authHeader h2{
-  margin: 0 0 8px;
-  font-size: 28px;
-}
-
-.authHeader p{
-  margin: 0 0 18px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.authForm{
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.authActions{
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.authAction{
-  min-width: 120px;
-}
-
-.authAlert{
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.authAlert--success{
-  background: rgba(34, 197, 94, 0.12);
-  color: #166534;
-}
-
-.authAlert--error{
-  background: rgba(239, 68, 68, 0.12);
-  color: #991b1b;
 }
 
 @media (max-width: 768px){
