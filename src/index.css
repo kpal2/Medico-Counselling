@@ -1615,6 +1615,25 @@ button{ font-family: inherit; }
   text-transform: uppercase;
 }
 
+.tableSortButton{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.tableSortButton:hover{
+  color: var(--text);
+}
+
 .tableLink{
   color: var(--brandDark);
   font-weight: 700;

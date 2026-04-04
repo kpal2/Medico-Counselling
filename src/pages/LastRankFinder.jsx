@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import { useCounsellingData } from "../hooks/useCounsellingData";
 import { formatRank } from "../lib/counsellingData";
 
+const defaultSort = {
+  key: "closing_rank",
+  direction: "desc",
+};
+
 const getResultKey = (row) =>
   [
     row.institute_code,
@@ -16,6 +21,23 @@ const getResultKey = (row) =>
     row.closing_rank,
   ].join("-");
 
+const sortValueGetters = {
+  institute_name: (row) => row.institute_name ?? "",
+  state: (row) => row.state ?? "",
+  quota_name: (row) => row.quota_name ?? "",
+  category_name: (row) => row.category_name ?? "",
+  round_number: (row) => Number(row.round_number) || 0,
+  closing_rank: (row) => Number(row.closing_rank) || 0,
+};
+
+const compareValues = (left, right) => {
+  if (typeof left === "number" && typeof right === "number") {
+    return left - right;
+  }
+
+  return String(left).localeCompare(String(right), "en", { sensitivity: "base" });
+};
+
 const LastRankFinder = () => {
   const { data, loading, error } = useCounsellingData();
   const [subject, setSubject] = useState("MBBS");
@@ -23,6 +45,31 @@ const LastRankFinder = () => {
   const [quota, setQuota] = useState("All");
   const [round, setRound] = useState("All");
   const [state, setState] = useState("All");
+  const [sortConfig, setSortConfig] = useState(defaultSort);
+
+  const toggleSort = (key) => {
+    setSortConfig((current) => {
+      if (current.key === key) {
+        return {
+          key,
+          direction: current.direction === "asc" ? "desc" : "asc",
+        };
+      }
+
+      return {
+        key,
+        direction: key === "closing_rank" ? "desc" : "asc",
+      };
+    });
+  };
+
+  const getSortIndicator = (key) => {
+    if (sortConfig.key !== key) {
+      return " <>";
+    }
+
+    return sortConfig.direction === "asc" ? " ^" : " v";
+  };
 
   const results = useMemo(() => {
     if (!data) {
@@ -35,9 +82,20 @@ const LastRankFinder = () => {
       .filter((row) => quota === "All" || row.quota_name === quota)
       .filter((row) => round === "All" || String(row.round_number) === round)
       .filter((row) => state === "All" || row.state === state)
-      .sort((left, right) => right.closing_rank - left.closing_rank)
+      .sort((left, right) => {
+        const getValue = sortValueGetters[sortConfig.key];
+        const leftValue = getValue(left);
+        const rightValue = getValue(right);
+        const comparison = compareValues(leftValue, rightValue);
+
+        if (comparison !== 0) {
+          return sortConfig.direction === "asc" ? comparison : -comparison;
+        }
+
+        return right.closing_rank - left.closing_rank;
+      })
       .slice(0, 100);
-  }, [category, data, quota, round, state, subject]);
+  }, [category, data, quota, round, sortConfig, state, subject]);
 
   if (loading) {
     return <div className="dataPage"><p>Loading cutoff data...</p></div>;
@@ -109,12 +167,36 @@ const LastRankFinder = () => {
         <table className="dataTable">
           <thead>
             <tr>
-              <th>College</th>
-              <th>State</th>
-              <th>Quota</th>
-              <th>Category</th>
-              <th>Round</th>
-              <th>Closing Rank</th>
+              <th>
+                <button className="tableSortButton" type="button" onClick={() => toggleSort("institute_name")}>
+                  College{getSortIndicator("institute_name")}
+                </button>
+              </th>
+              <th>
+                <button className="tableSortButton" type="button" onClick={() => toggleSort("state")}>
+                  State{getSortIndicator("state")}
+                </button>
+              </th>
+              <th>
+                <button className="tableSortButton" type="button" onClick={() => toggleSort("quota_name")}>
+                  Quota{getSortIndicator("quota_name")}
+                </button>
+              </th>
+              <th>
+                <button className="tableSortButton" type="button" onClick={() => toggleSort("category_name")}>
+                  Category{getSortIndicator("category_name")}
+                </button>
+              </th>
+              <th>
+                <button className="tableSortButton" type="button" onClick={() => toggleSort("round_number")}>
+                  Round{getSortIndicator("round_number")}
+                </button>
+              </th>
+              <th>
+                <button className="tableSortButton" type="button" onClick={() => toggleSort("closing_rank")}>
+                  Closing Rank{getSortIndicator("closing_rank")}
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
