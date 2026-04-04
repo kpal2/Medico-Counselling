@@ -3,6 +3,19 @@ import { Link } from "react-router-dom";
 import { useCounsellingData } from "../hooks/useCounsellingData";
 import { formatRank } from "../lib/counsellingData";
 
+const getResultKey = (row) =>
+  [
+    row.institute_code,
+    row.subject_name,
+    row.quota_name,
+    row.category_name,
+    row.allotted_category_name,
+    row.sub_category_name,
+    row.ph_status_name,
+    row.round_number,
+    row.closing_rank,
+  ].join("-");
+
 const LastRankFinder = () => {
   const { data, loading, error } = useCounsellingData();
   const [subject, setSubject] = useState("MBBS");
@@ -106,7 +119,7 @@ const LastRankFinder = () => {
           </thead>
           <tbody>
             {results.map((row) => (
-              <tr key={`${row.institute_code}-${row.subject_name}-${row.quota_name}-${row.category_name}-${row.round_number}`}>
+              <tr key={getResultKey(row)}>
                 <td>
                   <Link className="tableLink" to={`/college/${row.institute_code}`}>
                     {row.institute_name}
