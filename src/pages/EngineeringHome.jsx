@@ -13,9 +13,6 @@ const EngineeringHome = () => {
           <Link className="ctaBtn ctaBtn--primary" to="/">
             Back to Platform Home
           </Link>
-          <Link className="ctaBtn ctaBtn--ghost" to="/medical">
-            Open Medical Counselling
-          </Link>
         </div>
       </div>
     </div>

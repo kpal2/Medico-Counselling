@@ -1,9 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useCounsellingData } from "../hooks/useCounsellingData";
 import { formatRank } from "../lib/counsellingData";
 
 const Footer = () => {
-  const { data } = useCounsellingData();
+  const { pathname } = useLocation();
+  const datasetType = pathname.startsWith("/pg") ? "pg" : "ug";
+  const { data } = useCounsellingData(datasetType);
+  const totalRowsLabel = datasetType === "pg" ? "Cutoff Rows" : "Admitted Records";
+  const roundsCount = data?.options?.rounds?.length ?? 5;
 
   return (
     <footer className="footer">
@@ -11,7 +15,7 @@ const Footer = () => {
         <div className="statsBand__inner">
           <div className="stat">
             <div className="stat__num">{data ? formatRank(data.meta.totalAdmissions) : "..."}</div>
-            <div className="stat__label">Admitted Records</div>
+            <div className="stat__label">{totalRowsLabel}</div>
           </div>
           <div className="stat">
             <div className="stat__num">{data ? formatRank(data.meta.totalCutoffGroups) : "..."}</div>
@@ -22,7 +26,7 @@ const Footer = () => {
             <div className="stat__label">Institutes</div>
           </div>
           <div className="stat">
-            <div className="stat__num">5</div>
+            <div className="stat__num">{formatRank(roundsCount)}</div>
             <div className="stat__label">Counselling Rounds</div>
           </div>
         </div>
@@ -59,16 +63,28 @@ const Footer = () => {
           <div className="footerCol">
             <div className="footerTitle">Quick Links</div>
             <Link className="footerLink" to="/">Home</Link>
-            <Link className="footerLink" to="/medical">Medical Counselling</Link>
+            <Link className="footerLink" to="/medical">UG Counselling</Link>
+            <Link className="footerLink" to="/pg">PG Counselling</Link>
             <Link className="footerLink" to="/engineering">JEE Counselling</Link>
-            <Link className="footerLink" to="/explore">Counselling Trends</Link>
+            <Link className="footerLink" to="/explore">UG Trends</Link>
           </div>
 
           <div className="footerCol">
             <div className="footerTitle">Resources</div>
-            <Link className="footerLink" to="/predictor">College Predictor</Link>
-            <Link className="footerLink" to="/colleges">Colleges</Link>
-            <Link className="footerLink" to="/cutoff">Cutoff Search</Link>
+            {datasetType === "pg" ? (
+              <>
+                <Link className="footerLink" to="/pg/explore">PG Trends</Link>
+                <Link className="footerLink" to="/pg/predictor">PG Predictor</Link>
+                <Link className="footerLink" to="/pg/cutoff">PG Cutoff Search</Link>
+                <Link className="footerLink" to="/pg/colleges">PG Colleges</Link>
+              </>
+            ) : (
+              <>
+                <Link className="footerLink" to="/predictor">College Predictor</Link>
+                <Link className="footerLink" to="/colleges">Colleges</Link>
+                <Link className="footerLink" to="/cutoff">Cutoff Search</Link>
+              </>
+            )}
             <Link className="footerLink" to="/about">About</Link>
           </div>
 
@@ -78,8 +94,8 @@ const Footer = () => {
           <span>&copy; {new Date().getFullYear()} MediCounsel. All rights reserved.</span>
           <div className="footerBottom__links">
             <Link className="footerMiniLink" to="/about">About</Link>
-            <Link className="footerMiniLink" to="/colleges">Colleges</Link>
-            <Link className="footerMiniLink" to="/cutoff">Cutoffs</Link>
+            <Link className="footerMiniLink" to={datasetType === "pg" ? "/pg/colleges" : "/colleges"}>Colleges</Link>
+            <Link className="footerMiniLink" to={datasetType === "pg" ? "/pg/cutoff" : "/cutoff"}>Cutoffs</Link>
           </div>
         </div>
       </section>

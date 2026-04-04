@@ -30,7 +30,7 @@ const aggregateRoundSeries = (rows, mode) => {
           closing_rank: minRow.closing_rank,
           institute_name: minRow.institute_name,
           sample_count: roundRows.length,
-          metric_label: "Best closing AIR",
+          metric_label: "Best closing rank",
         };
       }
 
@@ -42,7 +42,7 @@ const aggregateRoundSeries = (rows, mode) => {
         sample_count: roundRows.length,
         min_rank: minRow.closing_rank,
         max_rank: maxRow.closing_rank,
-        metric_label: "Median closing AIR",
+        metric_label: "Median closing rank",
       };
     });
 };
@@ -73,66 +73,66 @@ const buildUniqueRecommendations = (rows) => {
       city: row.city || row.state || "-",
       cutoff: row.closing_rank,
       chance: index < 8 ? "Low" : index < 16 ? "Medium" : "High",
-      courses: [row.subject_name, row.quota_name, `Round ${row.round_number}`],
+      courses: [
+        row.subject_name,
+        row.quota_name,
+        `Year ${row.counselling_year}`,
+        `Round ${row.round_number}`,
+      ],
     }));
 };
 
-const buildChartDetails = (rows, labelPrefix) => (
+const buildChartDetails = (rows) => (
   rows.map((row) => ({
     label: `Round ${row.round_number}`,
-    value: `${row.metric_label ?? "Closing AIR"} ${formatRank(row.closing_rank)}`,
+    value: `${row.metric_label ?? "Closing rank"} ${formatRank(row.closing_rank)}`,
     meta: [
       { label: "Institute", value: row.institute_name ?? "-" },
       { label: "Quota", value: row.quota_name ?? "-" },
       { label: "Category", value: row.category_name ?? "-" },
-      { label: labelPrefix, value: row.subject_name ?? "-" },
+      { label: "Subject", value: row.subject_name ?? "-" },
+      { label: "Year", value: row.counselling_year ?? "-" },
       { label: "Samples", value: formatRank(row.sample_count ?? row.admitted_count) },
       ...(row.min_rank != null ? [{ label: "Round range", value: `${formatRank(row.min_rank)} - ${formatRank(row.max_rank)}` }] : []),
     ],
   }))
 );
 
-const HistoricalExplorer = () => {
-  const { data, loading, error } = useCounsellingData("ug");
-  const [subject, setSubject] = useState("MBBS");
-  const [category, setCategory] = useState("General");
+const PgHistoricalExplorer = () => {
+  const { data, loading, error } = useCounsellingData("pg");
+  const [subject, setSubject] = useState("");
+  const [category, setCategory] = useState("All");
   const [quota, setQuota] = useState("All");
   const [state, setState] = useState("All");
+  const [year, setYear] = useState("");
+
+  const activeSubject = subject || data?.options.subjects?.[0] || "";
+  const activeYear = year || String(data?.options?.years?.[0] ?? "All");
 
   const filteredRows = useMemo(() => {
-    if (!data) {
+    if (!data || !activeSubject) {
       return [];
     }
 
     return data.cutoffs
-      .filter((row) => row.subject_name === subject)
+      .filter((row) => row.subject_name === activeSubject)
       .filter((row) => category === "All" || row.category_name === category)
       .filter((row) => quota === "All" || row.quota_name === quota)
       .filter((row) => state === "All" || row.state === state)
+      .filter((row) => activeYear === "All" || String(row.counselling_year) === activeYear)
       .sort((left, right) => left.closing_rank - right.closing_rank);
-  }, [category, data, quota, state, subject]);
+  }, [activeSubject, activeYear, category, data, quota, state]);
 
-  const recommendations = useMemo(
-    () => buildUniqueRecommendations(filteredRows),
-    [filteredRows],
-  );
-
-  const bestTrendByRound = useMemo(
-    () => aggregateRoundSeries(filteredRows, "best"),
-    [filteredRows],
-  );
-
-  const medianTrendByRound = useMemo(
-    () => aggregateRoundSeries(filteredRows, "median"),
-    [filteredRows],
-  );
+  const recommendations = useMemo(() => buildUniqueRecommendations(filteredRows), [filteredRows]);
+  const bestTrendByRound = useMemo(() => aggregateRoundSeries(filteredRows, "best"), [filteredRows]);
+  const medianTrendByRound = useMemo(() => aggregateRoundSeries(filteredRows, "median"), [filteredRows]);
 
   if (loading) {
-    return <div className="dataPage"><p>Loading trend data...</p></div>;
+    return <div className="dataPage"><p>Loading PG trend data...</p></div>;
   }
 
   if (error) {
-    return <div className="dataPage"><p>Unable to load trend data: {error}</p></div>;
+    return <div className="dataPage"><p>Unable to load PG trend data: {error}</p></div>;
   }
 
   return (
@@ -140,8 +140,9 @@ const HistoricalExplorer = () => {
       <aside className="filtersCard">
         <div className="filtersHeader">
           <span className="filtersIcon">#</span>
-          <h3>Smart Filters</h3>
+          <h3>PG Trend Explorer</h3>
         </div>
+        <p className="filtersSubtext">Analyze PG cutoff movement using the dedicated PG dataset.</p>
 
         <div className="filterBlock">
           <label>Quota</label>
@@ -155,7 +156,7 @@ const HistoricalExplorer = () => {
 
         <div className="filterBlock">
           <label>Course / Subject</label>
-          <select value={subject} onChange={(event) => setSubject(event.target.value)}>
+          <select value={activeSubject} onChange={(event) => setSubject(event.target.value)}>
             {data.options.subjects.map((option) => (
               <option key={option} value={option}>{option}</option>
             ))}
@@ -182,37 +183,49 @@ const HistoricalExplorer = () => {
           </select>
         </div>
 
+        <div className="filterBlock">
+          <label>Year</label>
+          <select value={activeYear} onChange={(event) => setYear(event.target.value)}>
+            <option value="All">All</option>
+            {data.options.years.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+        </div>
       </aside>
 
       <section className="trendsMain">
         <div className="chartRow">
           <CutoffChart
-            title={`${subject} best cutoff trend`}
-            subtitle="Most competitive closing AIR by round for current filters"
+            title={`${activeSubject} best cutoff trend`}
+            subtitle="Most competitive PG closing rank by round for current filters"
             points={buildChartPoints(bestTrendByRound)}
             years={bestTrendByRound.map((row) => `R${row.round_number}`)}
-            details={buildChartDetails(bestTrendByRound, "Subject")}
+            details={buildChartDetails(bestTrendByRound)}
           />
           <CutoffChart
-            title={`${subject} round median`}
-            subtitle="Median closing AIR by round for current filters"
+            title={`${activeSubject} round median`}
+            subtitle="Median PG closing rank by round for current filters"
             points={buildChartPoints(medianTrendByRound)}
             years={medianTrendByRound.map((row) => `R${row.round_number}`)}
-            details={buildChartDetails(medianTrendByRound, "Subject")}
+            details={buildChartDetails(medianTrendByRound)}
           />
         </div>
 
         <div className="resultsHeader">
           <div className="resultsTitle">
             <h2>Top Recommendations</h2>
-            <span className="infoDot" title="Based on imported cutoff data">i</span>
+            <span className="infoDot" title="Based on imported PG cutoff data">i</span>
           </div>
           <div className="resultsMeta">Showing {recommendations.length} of {filteredRows.length} results</div>
         </div>
 
         <div className="resultsList">
-          {recommendations.map((row) => (
-            <div className="resultCard" key={`${row.institute_code}-${row.quota_name}-${row.round_number}-${row.category_name}`}>
+          {recommendations.map((row, index) => (
+            <div
+              className="resultCard"
+              key={`${row.institute_code}-${row.subject_name}-${row.quota_name}-${row.category_name}-${row.counselling_year}-${row.round_number}-${row.closing_rank}-${index}`}
+            >
               <div className="resultCard__top">
                 <div className="leftMeta">
                   <span className={`pillType pillType--${row.type.toLowerCase()}`}>{row.type}</span>
@@ -226,7 +239,7 @@ const HistoricalExplorer = () => {
 
               <div className="metricsRow">
                 <div className="metric">
-                  <div className="metricLabel">Cutoff Rank</div>
+                  <div className="metricLabel">Closing Rank</div>
                   <div className="metricValue">{formatRank(row.cutoff)}</div>
                 </div>
                 <div className="metric">
@@ -244,7 +257,7 @@ const HistoricalExplorer = () => {
               </div>
 
               <div className="resultActions">
-                <Link className="btnPrimary" to={`/college/${row.institute_code}`}>
+                <Link className="btnPrimary" to={`/pg/college/${row.institute_code}`}>
                   View Details
                 </Link>
               </div>
@@ -256,4 +269,4 @@ const HistoricalExplorer = () => {
   );
 };
 
-export default HistoricalExplorer;
+export default PgHistoricalExplorer;

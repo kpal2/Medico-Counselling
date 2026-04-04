@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+db/*.sqlite
+scripts/__pycache__/
+*.pyc
+public/data/counselling-data.json
+public/data/counselling-data-ug.json
 .env
 .env.local
 .env.development.local

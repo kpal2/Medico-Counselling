@@ -1,17 +1,24 @@
-let counsellingDataPromise;
+const datasetUrlByType = {
+  ug: "/data/counselling-data-ug.json",
+  pg: "/data/counselling-data.json",
+};
 
-export function loadCounsellingData() {
-  if (!counsellingDataPromise) {
-    counsellingDataPromise = fetch("/data/counselling-data.json").then((response) => {
+const counsellingDataPromises = new Map();
+
+export function loadCounsellingData(datasetType = "ug") {
+  const datasetUrl = datasetUrlByType[datasetType] ?? datasetUrlByType.ug;
+
+  if (!counsellingDataPromises.has(datasetUrl)) {
+    counsellingDataPromises.set(datasetUrl, fetch(datasetUrl).then((response) => {
       if (!response.ok) {
         throw new Error("Failed to load counselling data");
       }
 
       return response.json();
-    });
+    }));
   }
 
-  return counsellingDataPromise;
+  return counsellingDataPromises.get(datasetUrl);
 }
 
 export function estimateChance(rank, closingRank) {

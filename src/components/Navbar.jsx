@@ -4,6 +4,7 @@ import RouteLinks from "./RouteLinks";
 const Navbar = () => {
   const { pathname } = useLocation();
   const isPlatformHome = pathname === "/";
+  const isPgRoute = pathname.startsWith("/pg");
 
   return (
     <header className="topbar">
@@ -31,7 +32,10 @@ const Navbar = () => {
         {isPlatformHome ? (
           <nav className="nav">
             <NavLink to="/medical" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
-              Medical
+              UG
+            </NavLink>
+            <NavLink to="/pg" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
+              PG
             </NavLink>
             <NavLink to="/engineering" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
               Engineering
@@ -41,13 +45,11 @@ const Navbar = () => {
             </NavLink>
           </nav>
         ) : (
-          <RouteLinks />
+          <RouteLinks variant={isPgRoute ? "pg" : "ug"} />
         )}
 
         <div className="topbar__right">
-          {isPlatformHome ? (
-            <Link className="primaryBtn" to="/medical">Open Medical</Link>
-          ) : (
+          {!isPlatformHome && (
             <>
               <span className="authStatus">Public beta</span>
               <button className="primaryBtn primaryBtn--disabled" type="button" disabled>

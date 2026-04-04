@@ -1,23 +1,36 @@
 import { NavLink } from "react-router-dom";
 
-const RouteLinks = () => {
+const ugLinks = [
+  { to: "/medical", label: "UG Home", end: true },
+  { to: "/explore", label: "Trends" },
+  { to: "/predictor", label: "Predictor" },
+  { to: "/cutoff", label: "Cutoffs" },
+  { to: "/colleges", label: "Colleges" },
+];
+
+const pgLinks = [
+  { to: "/pg", label: "PG Home", end: true },
+  { to: "/pg/explore", label: "Trends" },
+  { to: "/pg/predictor", label: "Predictor" },
+  { to: "/pg/cutoff", label: "Cutoffs" },
+  { to: "/pg/colleges", label: "Colleges" },
+];
+
+const RouteLinks = ({ variant = "ug" }) => {
+  const links = variant === "pg" ? pgLinks : ugLinks;
+
   return (
     <nav className="nav">
-      <NavLink to="/medical" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
-        Home
-      </NavLink>
-      <NavLink to="/explore" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
-        Trends
-      </NavLink>
-      <NavLink to="/predictor" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
-        Predictor
-      </NavLink>
-      <NavLink to="/cutoff" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
-        Cutoffs
-      </NavLink>
-      <NavLink to="/colleges" className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}>
-        Colleges
-      </NavLink>
+      {links.map((link) => (
+        <NavLink
+          key={link.to}
+          to={link.to}
+          end={link.end}
+          className={({ isActive }) => `nav__link ${isActive ? "isActive" : ""}`}
+        >
+          {link.label}
+        </NavLink>
+      ))}
     </nav>
   );
 };

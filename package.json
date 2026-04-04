@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build:data": "python scripts/import_counselling_csv_pg.py && python scripts/export_counselling_data_pg.py && python scripts/import_counselling_csv_ug.py && python scripts/export_counselling_data_ug.py",
+    "build": "npm run build:data && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "db:import": "python scripts/import_counselling_csv.py",
-    "db:export": "python scripts/export_counselling_data.py",
-    "db:refresh": "python scripts/import_counselling_csv.py && python scripts/export_counselling_data.py"
+    "db:import": "python scripts/import_counselling_csv_pg.py",
+    "db:export": "python scripts/export_counselling_data_pg.py",
+    "db:refresh": "python scripts/import_counselling_csv_pg.py && python scripts/export_counselling_data_pg.py",
+    "db:import:ug": "python scripts/import_counselling_csv_ug.py",
+    "db:export:ug": "python scripts/export_counselling_data_ug.py",
+    "db:refresh:ug": "python scripts/import_counselling_csv_ug.py && python scripts/export_counselling_data_ug.py"
   },
   "dependencies": {
     "react": "^19.2.0",

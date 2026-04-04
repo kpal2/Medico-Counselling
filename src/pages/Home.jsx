@@ -1,10 +1,6 @@
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  const handleUgCounsellingClick = () => {
-    window.alert("UG counselling is under construction.");
-  };
-
   return (
     <div className="platformHome">
       <section className="platformHero">
@@ -28,14 +24,14 @@ const Home = () => {
             <div className="trackChoice trackChoice--medical">
               <span className="trackChoice__badge">Live now</span>
               <h2>Medical Counselling</h2>
-              <p>Open the Medico dashboard for trends, cutoff search, predictor flows, and college-level medical insights.</p>
+              <p>Choose between the live UG experience and the new PG dashboard, each backed by its own counselling dataset and workflow.</p>
               <div className="trackChoice__actions">
                 <Link className="trackChoice__action" to="/medical">
+                  Enter UG Counselling
+                </Link>
+                <Link className="trackChoice__action trackChoice__action--secondary" to="/pg">
                   Enter PG Counselling
                 </Link>
-                <button className="trackChoice__action trackChoice__action--secondary" type="button" onClick={handleUgCounsellingClick}>
-                  Enter UG Counselling
-                </button>
               </div>
             </div>
 

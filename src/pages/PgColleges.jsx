@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { useCounsellingData } from "../hooks/useCounsellingData";
 import { formatRank } from "../lib/counsellingData";
 
-const Colleges = () => {
-  const { data, loading, error } = useCounsellingData("ug");
+const PgColleges = () => {
+  const { data, loading, error } = useCounsellingData("pg");
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
 
@@ -29,18 +29,18 @@ const Colleges = () => {
   }, [data, deferredSearch]);
 
   if (loading) {
-    return <div className="dataPage"><p>Loading colleges...</p></div>;
+    return <div className="dataPage"><p>Loading PG colleges...</p></div>;
   }
 
   if (error) {
-    return <div className="dataPage"><p>Unable to load college data: {error}</p></div>;
+    return <div className="dataPage"><p>Unable to load PG college data: {error}</p></div>;
   }
 
   return (
     <div className="dataPage">
       <div className="pageIntro">
-        <h2>Colleges</h2>
-        <p>Browse institutes from the normalized database export.</p>
+        <h2>PG Colleges</h2>
+        <p>Browse institutes from the PG counselling dataset.</p>
       </div>
 
       <div className="toolCard">
@@ -65,7 +65,7 @@ const Colleges = () => {
                   {college.state ? ` • ${college.state}` : ""}
                 </div>
               </div>
-              <Link className="btnPrimary" to={`/college/${college.code}`}>
+              <Link className="btnPrimary" to={`/pg/college/${college.code}`}>
                 View Details
               </Link>
             </div>
@@ -80,11 +80,11 @@ const Colleges = () => {
                 </div>
               </div>
               <div className="metric">
-                <div className="metricLabel">Best AIR</div>
+                <div className="metricLabel">Best Rank</div>
                 <div className="metricValue">{formatRank(college.best_rank)}</div>
               </div>
               <div className="metric">
-                <div className="metricLabel">Last Recorded AIR</div>
+                <div className="metricLabel">Last Recorded Rank</div>
                 <div className="metricValue">{formatRank(college.last_rank)}</div>
               </div>
             </div>
@@ -95,4 +95,4 @@ const Colleges = () => {
   );
 };
 
-export default Colleges;
+export default PgColleges;

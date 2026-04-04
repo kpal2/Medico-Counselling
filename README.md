@@ -1,10 +1,13 @@
 # NEET Counselling Web
 
-This repository now includes a normalised relational database setup for the admitted-data CSV in [`public/All India_All_Round_25.xlsx - Admitted_Data.csv`](/c:/Users/amite/Downloads/project/neet-counselling-web/public/All%20India_All_Round_25.xlsx%20-%20Admitted_Data.csv).
+This repository now includes separate relational-data pipelines for:
+
+- [`public/All India &States 23to25 - All India &States 23to25_PG.csv`](/c:/Users/amite/Downloads/project/neet-counselling-web/public/All%20India%20%26States%2023to25%20-%20All%20India%20%26States%2023to25_PG.csv) for PG
+- [`public/All India_All_Round_25.xlsx_Admitted_Data_UG.csv`](/c:/Users/amite/Downloads/project/neet-counselling-web/public/All%20India_All_Round_25.xlsx_Admitted_Data_UG.csv) for UG
 
 ## Database layout
 
-The schema lives in [`db/schema.sql`](/c:/Users/amite/Downloads/project/neet-counselling-web/db/schema.sql) and splits the CSV into:
+UG uses [`db/schema.sql`](/c:/Users/amite/Downloads/project/neet-counselling-web/db/schema.sql) and splits the admitted-data CSV into:
 
 - `institutes`
 - `quotas`
@@ -18,14 +21,16 @@ The schema lives in [`db/schema.sql`](/c:/Users/amite/Downloads/project/neet-cou
 
 `admissions` is the fact table. Everything else is a lookup or dimension table.
 
-The schema also creates a `cutoff_summary` view with opening rank, closing rank, and admitted count grouped by institute, subject, quota, category, PH status, and round. That is the most direct source for pages like last-rank finder, college detail, and trend exploration.
+That schema also creates a `cutoff_summary` view with opening rank, closing rank, and admitted count grouped by institute, subject, quota, category, PH status, and round.
 
-## Build the database
+PG uses [`db/schema_pg.sql`](/c:/Users/amite/Downloads/project/neet-counselling-web/db/schema_pg.sql), which normalizes the summary-style PG cutoff CSV into quotas, categories, states, subjects, institutes, and `pg_cutoffs`.
+
+## Build the PG database
 
 Run:
 
 ```bash
-python scripts/import_counselling_csv.py
+python scripts/import_counselling_csv_pg.py
 ```
 
 or:
@@ -37,7 +42,7 @@ npm run db:import
 Then export the frontend dataset:
 
 ```bash
-python scripts/export_counselling_data.py
+python scripts/export_counselling_data_pg.py
 ```
 
 or refresh both the SQLite database and the static JSON used by the Vite app:
@@ -54,15 +59,53 @@ That creates:
 You can also override paths:
 
 ```bash
-python scripts/import_counselling_csv.py --csv "public/All India_All_Round_25.xlsx - Admitted_Data.csv" --db db/neet_counselling.sqlite
+python scripts/import_counselling_csv_pg.py --csv "public/All India &States 23to25 - All India &States 23to25_PG.csv" --db db/neet_counselling.sqlite
+```
+
+## Build the UG database
+
+Run:
+
+```bash
+python scripts/import_counselling_csv_ug.py
+```
+
+or:
+
+```bash
+npm run db:import:ug
+```
+
+Then export the frontend dataset:
+
+```bash
+python scripts/export_counselling_data_ug.py
+```
+
+or refresh both the UG SQLite database and its static JSON:
+
+```bash
+npm.cmd run db:refresh:ug
+```
+
+That creates:
+
+- [`db/neet_counselling_ug.sqlite`](/c:/Users/amite/Downloads/project/neet-counselling-web/db/neet_counselling_ug.sqlite)
+- [`public/data/counselling-data-ug.json`](/c:/Users/amite/Downloads/project/neet-counselling-web/public/data/counselling-data-ug.json)
+
+You can also override paths:
+
+```bash
+python scripts/import_counselling_csv_ug.py --csv "public/All India_All_Round_25.xlsx_Admitted_Data_UG.csv" --db db/neet_counselling_ug.sqlite
 ```
 
 ## Notes
 
-- Source row count detected from the CSV: `27758`
-- Distinct institute codes in the CSV: `574`
-- Subjects present in the CSV: `MBBS`, `BDS`, `B.Sc. Nursing`
-- The importer derives `name`, `address`, `city`, `state`, and `postal_code` for each institute when the CSV format is reliable enough, and always preserves the original value in `raw_label`
+- UG source row count detected from the CSV: `27758`
+- UG distinct institute codes in the CSV: `574`
+- UG subjects present in the CSV: `MBBS`, `BDS`, `B.Sc. Nursing`
+- The UG importer derives `name`, `address`, `city`, `state`, and `postal_code` for each institute when the CSV format is reliable enough, and always preserves the original value in `raw_label`
+- The PG importer expands columns like `CR 2024 1` into year/round-specific cutoff rows and parses tokens like `56(8)` into `closing_rank=56` and `admitted_count=8`
 
 ## Static deployment on Vercel
 

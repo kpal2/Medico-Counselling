@@ -7,13 +7,13 @@ const initialState = {
   error: null,
 };
 
-export function useCounsellingData() {
+export function useCounsellingData(datasetType = "ug") {
   const [state, setState] = useState(initialState);
 
   useEffect(() => {
     let active = true;
 
-    loadCounsellingData()
+    loadCounsellingData(datasetType)
       .then((data) => {
         if (active) {
           setState({
@@ -36,7 +36,7 @@ export function useCounsellingData() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [datasetType]);
 
   return state;
 }

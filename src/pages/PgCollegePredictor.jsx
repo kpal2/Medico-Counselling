@@ -3,23 +3,28 @@ import { Link } from "react-router-dom";
 import { useCounsellingData } from "../hooks/useCounsellingData";
 import { estimateChance, formatRank } from "../lib/counsellingData";
 
-const CollegePredictor = () => {
-  const { data, loading, error } = useCounsellingData("ug");
+const PgCollegePredictor = () => {
+  const { data, loading, error } = useCounsellingData("pg");
   const [rank, setRank] = useState("");
-  const [category, setCategory] = useState("General");
-  const [subject, setSubject] = useState("MBBS");
+  const [category, setCategory] = useState("All");
+  const [subject, setSubject] = useState("");
   const [state, setState] = useState("All");
+  const [year, setYear] = useState("");
 
+  const activeSubject = subject || data?.options.subjects?.[0] || "";
+  const activeYear = year || String(data?.options?.years?.[0] ?? "All");
   const numericRank = Number(rank);
+
   const predictions = useMemo(() => {
-    if (!data || !numericRank) {
+    if (!data || !numericRank || !activeSubject) {
       return [];
     }
 
     return data.cutoffs
-      .filter((row) => row.subject_name === subject)
-      .filter((row) => row.category_name === category)
+      .filter((row) => row.subject_name === activeSubject)
+      .filter((row) => category === "All" || row.category_name === category)
       .filter((row) => state === "All" || row.state === state)
+      .filter((row) => activeYear === "All" || String(row.counselling_year) === activeYear)
       .filter((row) => row.closing_rank >= numericRank)
       .map((row) => ({
         ...row,
@@ -28,22 +33,22 @@ const CollegePredictor = () => {
       }))
       .sort((left, right) => left.gap - right.gap)
       .slice(0, 12);
-  }, [category, data, numericRank, state, subject]);
+  }, [activeSubject, activeYear, category, data, numericRank, state]);
 
   if (loading) {
-    return <div className="predictorPage"><p>Loading prediction data...</p></div>;
+    return <div className="predictorPage"><p>Loading PG prediction data...</p></div>;
   }
 
   if (error) {
-    return <div className="predictorPage"><p>Unable to load prediction data: {error}</p></div>;
+    return <div className="predictorPage"><p>Unable to load PG prediction data: {error}</p></div>;
   }
 
   return (
     <div className="predictorPage">
       <div className="predictorHeader">
         <div className="predictorIcon">#</div>
-        <h1>College Predictor</h1>
-        <p>Enter your rank and compare it against recorded closing ranks from the database export.</p>
+        <h1>PG Predictor</h1>
+        <p>Enter your expected rank and compare it against PG closing ranks from the PG dataset.</p>
       </div>
 
       <div className="predictorCard">
@@ -51,7 +56,7 @@ const CollegePredictor = () => {
 
         <div className="formGrid">
           <div className="formGroup">
-            <label>NEET Rank</label>
+            <label>Expected Rank</label>
             <input
               type="number"
               placeholder="e.g. 4500"
@@ -63,6 +68,7 @@ const CollegePredictor = () => {
           <div className="formGroup">
             <label>Category</label>
             <select value={category} onChange={(event) => setCategory(event.target.value)}>
+              <option value="All">All</option>
               {data.options.categories.map((option) => (
                 <option key={option} value={option}>{option}</option>
               ))}
@@ -71,7 +77,7 @@ const CollegePredictor = () => {
 
           <div className="formGroup">
             <label>Preferred Course</label>
-            <select value={subject} onChange={(event) => setSubject(event.target.value)}>
+            <select value={activeSubject} onChange={(event) => setSubject(event.target.value)}>
               {data.options.subjects.map((option) => (
                 <option key={option} value={option}>{option}</option>
               ))}
@@ -88,17 +94,29 @@ const CollegePredictor = () => {
             </select>
           </div>
 
+          <div className="formGroup">
+            <label>Year</label>
+            <select value={activeYear} onChange={(event) => setYear(event.target.value)}>
+              <option value="All">All</option>
+              {data.options.years.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <button className="predictBtn" type="button">
-          Predict My Colleges
+          Predict My PG Colleges
         </button>
       </div>
 
       {!!predictions.length && (
         <div className="resultsList predictorResults">
-          {predictions.map((row) => (
-            <div className="resultCard" key={`${row.institute_code}-${row.quota_name}-${row.round_number}-${row.category_name}`}>
+          {predictions.map((row, index) => (
+            <div
+              className="resultCard"
+              key={`${row.institute_code}-${row.subject_name}-${row.quota_name}-${row.category_name}-${row.counselling_year}-${row.round_number}-${row.closing_rank}-${index}`}
+            >
               <div className="resultCard__top">
                 <div className="leftMeta">
                   <span className="pillType pillType--govt">{row.subject_name}</span>
@@ -126,7 +144,7 @@ const CollegePredictor = () => {
               </div>
 
               <div className="resultActions">
-                <Link className="btnPrimary" to={`/college/${row.institute_code}`}>
+                <Link className="btnPrimary" to={`/pg/college/${row.institute_code}`}>
                   View Details
                 </Link>
               </div>
@@ -138,4 +156,4 @@ const CollegePredictor = () => {
   );
 };
 
-export default CollegePredictor;
+export default PgCollegePredictor;

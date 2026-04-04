@@ -34,12 +34,13 @@ def build_payload(db_path: Path) -> dict:
                 allotted_category_name,
                 sub_category_name,
                 ph_status_name,
+                counselling_year,
                 round_number,
                 opening_rank,
                 closing_rank,
                 admitted_count
             FROM cutoff_summary
-            ORDER BY institute_name, subject_name, round_number, quota_name, category_name
+            ORDER BY counselling_year DESC, institute_name, subject_name, round_number, quota_name, category_name
             """,
         )
 
@@ -49,14 +50,15 @@ def build_payload(db_path: Path) -> dict:
             SELECT
                 i.code,
                 i.name,
-                i.city,
-                i.state,
-                i.postal_code,
-                COUNT(a.id) AS total_admissions,
-                MIN(a.air_rank) AS best_rank,
-                MAX(a.air_rank) AS last_rank
+                '' AS city,
+                s.name AS state,
+                '' AS postal_code,
+                COUNT(pc.id) AS total_admissions,
+                MIN(pc.closing_rank) AS best_rank,
+                MAX(pc.closing_rank) AS last_rank
             FROM institutes i
-            JOIN admissions a ON a.institute_id = i.id
+            JOIN states s ON s.id = i.state_id
+            JOIN pg_cutoffs pc ON pc.institute_id = i.id
             GROUP BY i.id
             ORDER BY i.name
             """,
@@ -67,12 +69,12 @@ def build_payload(db_path: Path) -> dict:
             """
             SELECT
                 i.code AS institute_code,
-                s.name AS subject_name
-            FROM admissions a
-            JOIN institutes i ON i.id = a.institute_id
-            JOIN subjects s ON s.id = a.subject_id
-            GROUP BY i.code, s.name
-            ORDER BY i.code, s.name
+                subj.name AS subject_name
+            FROM pg_cutoffs pc
+            JOIN institutes i ON i.id = pc.institute_id
+            JOIN subjects subj ON subj.id = pc.subject_id
+            GROUP BY i.code, subj.name
+            ORDER BY i.code, subj.name
             """,
         )
 
@@ -87,12 +89,13 @@ def build_payload(db_path: Path) -> dict:
             "subjects": [row["name"] for row in rows_to_dicts(cursor, "SELECT name FROM subjects ORDER BY name")],
             "categories": [row["name"] for row in rows_to_dicts(cursor, "SELECT name FROM categories ORDER BY name")],
             "quotas": [row["name"] for row in rows_to_dicts(cursor, "SELECT name FROM quotas ORDER BY name")],
-            "rounds": [row["round_number"] for row in rows_to_dicts(cursor, "SELECT round_number FROM rounds ORDER BY round_number")],
-            "states": [row["state"] for row in rows_to_dicts(cursor, "SELECT DISTINCT state FROM institutes WHERE state <> '' ORDER BY state")],
+            "rounds": [row["round_number"] for row in rows_to_dicts(cursor, "SELECT DISTINCT round_number FROM pg_cutoffs ORDER BY round_number")],
+            "states": [row["name"] for row in rows_to_dicts(cursor, "SELECT name FROM states ORDER BY name")],
+            "years": [row["counselling_year"] for row in rows_to_dicts(cursor, "SELECT DISTINCT counselling_year FROM pg_cutoffs ORDER BY counselling_year DESC")],
         }
 
         meta = {
-            "totalAdmissions": cursor.execute("SELECT COUNT(*) FROM admissions").fetchone()[0],
+            "totalAdmissions": cursor.execute("SELECT COUNT(*) FROM pg_cutoffs").fetchone()[0],
             "totalInstitutes": cursor.execute("SELECT COUNT(*) FROM institutes").fetchone()[0],
             "totalCutoffGroups": cursor.execute("SELECT COUNT(*) FROM cutoff_summary").fetchone()[0],
         }
@@ -113,9 +116,9 @@ def export_payload(db_path: Path, output_path: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Export counselling SQLite data into static JSON for the frontend.")
-    parser.add_argument("--db", type=Path, default=DEFAULT_DB_PATH, help="Path to the source SQLite database.")
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_PATH, help="Path to the exported JSON file.")
+    parser = argparse.ArgumentParser(description="Export PG counselling SQLite data into static JSON for the frontend.")
+    parser.add_argument("--db", type=Path, default=DEFAULT_DB_PATH, help="Path to the source PG SQLite database.")
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_PATH, help="Path to the exported PG JSON file.")
     args = parser.parse_args()
 
     export_payload(args.db.resolve(), args.output.resolve())
