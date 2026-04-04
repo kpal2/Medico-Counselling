@@ -27,7 +27,7 @@ const MedicalHome = () => {
             </p>
 
             <div className="hero__cta">
-              <Link className="ctaBtn ctaBtn--primary" to="/explore">
+              <Link className="ctaBtn ctaBtn--ghost" to="/explore">
                 Explore Trends
               </Link>
               <Link className="ctaBtn ctaBtn--ghost" to="/predictor">
