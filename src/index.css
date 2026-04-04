@@ -352,12 +352,25 @@ button{ font-family: inherit; }
 .trackChoice__action{
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 12px 16px;
   border-radius: 14px;
   font-size: 14px;
   font-weight: 900;
   background: rgba(255,255,255,0.74);
   border: 1px solid rgba(15,23,42,0.08);
+  color: #132033;
+  cursor: pointer;
+}
+
+.trackChoice__actions{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.trackChoice__action--secondary{
+  background: rgba(255,255,255,0.46);
 }
 
 .trackChoice--medical{
